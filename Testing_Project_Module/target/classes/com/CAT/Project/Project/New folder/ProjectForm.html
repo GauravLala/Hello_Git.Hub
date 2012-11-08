@@ -1,0 +1,377 @@
+<HTML>
+
+<HEAD>
+</HEAD>
+
+<body>
+<div style="margin:10px 0 0 0;">
+  <div class="title">プロジェクト入力</div>
+</div>
+
+<form action="_proj_f" method="post">
+  <input type="hidden" name="f" value="proj_i" />
+  <input type="hidden" name="proj_id" value="<?cs var:proj_id ?>" />
+  <input type="hidden" name="open" value="<?cs var:open ?>" />
+
+  <?cs if:err ?>
+    <div class="error" style="margin:15px 0 0 0;">
+      <?cs each:p=Errs ?>
+        <p><?cs var:p.err_msg ?></p>
+      <?cs /each ?>
+    </div>
+  <?cs /if ?>
+
+  <table class="stripe2" style="width:100%;margin:15px 0 0 0;">
+    <tr>
+      <th style="text-align:left;width:100px;">顧客</th>
+      <th class="mark">*</th>
+      <td <?cs if:err_corp_id ?>class="error"<?cs /if ?>>
+        <?cs if:!proj_id ?>
+          <input id="p-search" type="text" class="search" placeholder="Search.." />
+          <a id="p-reset" href="" style="vertical-align:middle;"><img src="/img/common/x.png" alt="" style="vertical-align:middle;margin:0 10px 0 0;" /></a>
+        <?cs /if ?>
+        <?cs if:proj_id ?>
+          <input type="hidden" name="corp_id" value="<?cs var:corp_id ?>" />
+        <?cs /if ?>
+        <select id="p-select_corp" name="corp_id" style="max-width:300px" <?cs if:proj_id ?>disabled="disabled"<?cs /if ?>>
+          <option value="">--選択--</option>
+          <?cs each:p=Corps ?>
+            <option value="<?cs var:p.corp_id ?>" <?cs if:corp_id==p.corp_id ?>selected="selected"<?cs /if ?>><?cs var:p.corp_name ?></option>
+          <?cs /each ?>
+        </select>
+
+        <?cs if:proj_id ?>
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">顧客の変更はできません</span>
+        <?cs /if ?>
+      </td>
+    </tr>
+    <tr>
+      <th style="text-align:left;">サービス</th>
+      <th class="mark">*</th>
+      <td <?cs if:err_serv_id ?>class="error"<?cs /if ?>>
+        <select id="p-select_serv" name="serv_id" style="max-width:300px;" <?cs if:user_id ?>disabled="disabled"<?cs /if ?>>
+          <option value="">--選択--</option>
+          <?cs each:p=Servs ?>
+            <option value="<?cs var:p.serv_id ?>" <?cs if:serv_id==p.serv_id ?>selected="selected"<?cs /if ?>><?cs var:p.serv_name ?></option>
+          <?cs /each ?>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th style="text-align:left;">プロジェクト名</th>
+      <th class="mark">*</th>
+      <td <?cs if:err_proj_name ?>class="error"<?cs /if ?>>
+        <input type="text" name="proj_name" value="<?cs var:proj_name ?>" maxlength="100" style="width:200px" />
+        <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">1〜100文字（例）テスト支援ツール開発</span>
+      </td>
+    </tr>
+    <tr>
+      <th style="text-align:left;">工程名</th>
+      <th class="mark">*</th>
+      <td>
+
+        <div id="p-canvas">
+
+          <?cs if:subcount(Flows) ?>
+            <?cs each:p=Flows ?>
+              <div class="p-flow" style="margin:5px 0 0 0;">
+
+                <?cs if:p.new ?>
+                  <input type="text" name="<?cs var:p.i ?>-flow_name-new" value="<?cs var:p.flow_name ?>" maxlength="200" style="width:400px;vertical-align:middle;" <?cs if:p.err_flow_name ?>class="error"<?cs /if ?> />
+                  <?cs if:p.i>=2 ?>
+                    <a class="p-del" href="" style="vertical-align:middle;"><img src="/img/common/x.png" alt="" style="vertical-align:middle;" /></a>
+                  <?cs /if ?>
+                  <img src="/img/ope/new.png" style="vertical-align:middle;margin:0 0 0 2px;" />
+                  <?cs if:p.i==1 ?>
+                    <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">1〜200文字（例）テスト実行</span>
+                  <?cs /if ?>
+
+                <?cs elif:p.del ?>
+                  <input type="hidden" name="<?cs var:p.i ?>-flow_del-<?cs var:p.flow_id ?>" value="1" />
+
+                <?cs else ?>
+                  <input type="text" name="<?cs var:p.i ?>-flow_name-<?cs var:p.flow_id ?>" value="<?cs var:p.flow_name ?>" maxlength="200" style="width:400px;vertical-align:middle;" <?cs if:p.err_flow_name ?>class="error"<?cs /if ?> />
+                  <?cs if:p.i>=2 ?>
+                    <a class="p-del" href="" style="vertical-align:middle;" data-i="<?cs var:p.i ?>" data-flow_id="<?cs var:p.flow_id ?>"><img src="/img/common/x.png" alt="" style="vertical-align:middle;" /></a>
+                  <?cs /if ?>
+                <?cs /if ?>
+              </div>
+            <?cs /each ?>
+
+          <?cs else ?>
+            <div class="p-flow">
+              <input type="text" name="1-flow_name-new" value="<?cs var:flow_name ?>" maxlength="100" style="width:400px;vertical-align:middle;" <?cs if:err_flow_name ?>class="error"<?cs /if ?> />
+              <img src="/img/ope/new.png" style="vertical-align:middle;margin:0 0 0 2px;" />
+              <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">1〜200文字（例）テスト実行</span>
+            </div>
+          <?cs /if ?>
+        </div>
+
+        <div style="margin:5px 0 0 0;">
+          <a href="" class="p-add button small">+</a>
+        </div>
+
+        <div id="p-base" class="p-flow" style="margin:5px 0 0 0;display:none;">
+          <input type="text" name="x-flow_name-new" value="" maxlength="200" style="width:400px;vertical-align:middle;" />
+          <a class="p-del" href="" style="vertical-align:middle;"><img src="/img/common/x.png" alt="" style="vertical-align:middle;" /></a>
+          <img src="/img/ope/new.png" style="vertical-align:middle;margin:0 0 0 2px;" />
+        </div>
+
+      </td>
+    </tr>
+    <tr>
+      <th style="text-align:left;">BTS</th>
+      <th class="mark">*</th>
+      <td id="p-bts" <?cs if:err_bts_type ?>class="error"<?cs /if ?>>
+        <div>
+          <select id="p-bts_type" name="bts_type">
+            <option value="">--選択--</option>
+            <option value="1" <?cs if:bts_type==1 ?>selected="selected"<?cs /if ?>>CAT</option>
+            <option value="2" disabled="disabled" <?cs if:bts_type==2 ?>selected="selected"<?cs /if ?>>Bugzilla</option>
+          </select>
+        </div>
+
+        <!-- CAT -->
+        <div id="p-bts_box_1" class="p-bts_box radius" <?cs if:bts_type!=1 ?>style="display:none;"<?cs /if ?>>
+
+          <table id="p-key_canvas" style="width:100%;">
+
+            <tr id="p-key_base" class="p-key" style="display:none;">
+              <td style="vertical-align:top;">
+                <input type="text" class="p-key_name" data-name="x-key_name" value="" maxlength="20" style="width:100px;" />
+              </td>
+              <td style="vertical-align:top;">
+                <div style="float:left;margin:0 5px 0 0;">
+                  <a class="p-tag_add button tiny" style="vertical-align:middle;">+</a>
+                </div>
+                <div style="float:left;">
+                  <div class="p-tag_canvas"></div>
+                  <div style="clear:both;"></div>
+                </div>
+                <div style="clear:both;"></div>
+
+                <div class="p-tag_base" style="float:left;display:none;margin:0 5px 0 0;">
+                  <input type="text" class="p-tag_name" data-name="x-y-tag_name" value="" maxlength="20" style="width:100px;vertical-align:middle;" />
+                  <a class="p-tag_del" href="" style="vertical-align:middle;"><img src="/img/common/x.png" alt="" style="vertical-align:middle;" /></a>
+                </div>
+              </td>
+              <td style="vertical-align:top;">
+                <input id="p-x-key_type-1" type="radio" class="p-key_type" data-name="x-key_type" value="1" style="vertical-align:middle;" />
+                <label for="p-x-key_type-1" style="vertical-align:middle;">1つだけ</label>
+                <input id="p-x-key_type-2" type="radio" class="p-key_type" data-name="x-key_type" value="2" style="vertical-align:middle;" />
+                <label for="p-s-key_type-2" style="vertical-align:middle;">複数</label>
+                <span style="vertical-align:middle;">選択可能</span>
+                <input type="radio" class="p-key_type" data-name="x-key_type" value="" style="display:none;" checked="checked" />
+              </td>
+              <td style="vertical-align:middle;text-align:center;">
+                <a class="p-key_del" href="" style="vertical-align:middle;"><img src="/img/common/x.png" alt="" style="vertical-align:middle;" /></a>
+              </td>
+            </tr>
+
+            <tr>
+              <th style="width:110px;">項目名</th>
+              <th>選択肢</th>
+              <th style="width:170px;">入力制限</th>
+              <th style="width:30px;">削除</th>
+            </tr>
+
+            <?cs each:p=DefaultKeys ?>
+              <tr class="p-key">
+                <td style="vertical-align:top;">
+                  <span><?cs var:p.key_name ?></span>
+                  <input type="hidden" class="p-key_name" name="<?cs var:p.key_no ?>-key_name" value="<?cs var:p.key_name ?>" />
+                </td>
+                <td style="vertical-align:top;">
+                  <div style="float:left;">
+                    <div class="p-tag_canvas">
+                      <?cs each:p2=p.Tags ?>
+                        <div  style="float:left;margin:0 5px 0 0;">
+                          <a href="" class="p-tag gray button tiny no_select" style="vertical-align:middle;margin:0 0 0 3px;"><?cs var:p2.tag_name ?></a>
+                          <input type="hidden" class="p-tag_name" name="<?cs var:p.key_no ?>-<?cs var:p2.tag_no ?>-tag_name" value="<?cs var:p2.tag_name ?>" />
+                        </div>
+                      <?cs /each ?>
+                    </div>
+                    <div style="clear:both;"></div>
+                  </div>
+                  <div style="clear:both;"></div>
+                </td>
+                <td style="vertical-align:top;">
+                  <input type="hidden" class="p-key_type" name="<?cs var:p.key_no ?>-key_type" value="<?cs var:p.key_type ?>" />
+                  <?cs if:p.key_type==1 ?>1つだけ<?cs elif:p.key_type==2 ?>複数<?cs /if ?> 選択可能
+                </td>
+                <td style="vertical-align:middle;text-align:center;"></td>
+              </tr>
+            <?cs /each ?>
+
+            <?cs each:p=Keys ?>
+              <tr class="p-key">
+                <td style="vertical-align:top;">
+                  <input type="text" class="p-key_name <?cs if:p.err_key_name ?>error<?cs /if ?>" name="<?cs var:p.key_no ?>-key_name" value="<?cs var:p.key_name ?>" maxlength="20" style="width:100px;" />
+                </td>
+                <td style="vertical-align:top;">
+                  <div style="float:left;margin:0 5px 0 0;">
+                    <a class="p-tag_add button tiny" style="vertical-align:middle;">+</a>
+                  </div>
+                  <div style="float:left;">
+                    <div class="p-tag_canvas">
+                      <?cs each:p2=p.Tags ?>
+                        <div  style="float:left;margin:0 5px 0 0;">
+                          <input type="text" class="p-tag_name <?cs if:p2.err_tag_name ?>error<?cs /if ?>" name="<?cs var:p.key_no ?>-<?cs var:p2.tag_no ?>-tag_name" value="<?cs var:p2.tag_name ?>" maxlength="20" style="width:100px;vertical-align:middle;" />
+                          <a class="p-tag_del" href="" style="vertical-align:middle;"><img src="/img/common/x.png" alt="" style="vertical-align:middle;" /></a>
+                        </div>
+                      <?cs /each ?>
+                    </div>
+                    <div style="clear:both;"></div>
+                  </div>
+                  <div style="clear:both;"></div>
+
+                  <div class="p-tag_base" style="float:left;display:none;margin:0 5px 0 0;">
+                    <input type="text" class="p-tag_name" data-name="x-y-tag_name" value="" maxlength="20" style="width:100px;vertical-align:middle;" />
+                    <a class="p-tag_del" href="" style="vertical-align:middle;"><img src="/img/common/x.png" alt="" style="vertical-align:middle;" /></a>
+                  </div>
+
+                </td>
+                <td style="vertical-align:top;" <?cs if:p.err_key_type ?>class="error"<?cs /if ?>>
+                  <input id="p-<?cs var:p.key_no ?>-key_type-1" type="radio" class="p-key_type" name="<?cs var:p.key_no ?>-key_type" value="1" style="vertical-align:middle;" <?cs if:p.key_type==1 ?>checked="checked"<?cs /if ?> />
+                  <label for="p-<?cs var:p.key_no ?>-key_type-1" style="vertical-align:middle;">1つだけ</label>
+                  <input id="p-<?cs var:p.key_no ?>-key_type-2" type="radio" class="p-key_type" name="<?cs var:p.key_no ?>-key_type" value="2" style="vertical-align:middle;" <?cs if:p.key_type==2 ?>checked="checked"<?cs /if ?> />
+                  <label for="p-<?cs var:p.key_no ?>-key_type-2" style="vertical-align:middle;">複数</label>
+                  <span style="vertical-align:middle;">選択可能</span>
+                  <input type="radio" class="p-key_type" name="<?cs var:p.key_no ?>-key_type" value="" style="display:none;" <?cs if:!p.key_type ?>checked="checked"<?cs /if ?> />
+                </td>
+                <td style="vertical-align:middle;text-align:center;">
+                  <a class="p-key_del" href="" style="vertical-align:middle;"><img src="/img/common/x.png" alt="" style="vertical-align:middle;" /></a>
+                </td>
+              </tr>
+            <?cs /each ?>
+
+          </table>
+          <div style="margin:3px 0 0 0;">
+            <a class="p-key_add button small">+</a>
+          </div>
+        </div>
+
+        <!-- Bugzilla -->
+        <div id="p-bts_box_2" class="p-bts_box radius" <?cs if:bts_type!=2 ?>style="display:none;"<?cs /if ?>>
+          <table class="stripe" style="width:100%;">
+            <tr class="stripe">
+              <th style="width:100px;text-align:left;">トップURL</th>
+              <td <?cs if:err_bugzilla_url ?>class="error"<?cs /if ?>>
+                <input type="text" name="bugzilla_url" value="<?cs var:bugzilla_url ?>" maxlength="255" style="width:400px;" />
+              </td>
+            </tr>
+            <tr>
+              <th style="text-align:left;">エンドポイント</th>
+              <td <?cs if:err_bugzilla_end ?>class="error"<?cs /if ?>>
+                <input type="text" name="bugzilla_end" value="<?cs var:bugzilla_end ?>" maxlength="255" style="width:400px;" />
+              </td>
+            </tr>
+          </table>
+        </div>
+
+      </td>
+    </tr>
+  </table>
+
+  <div style="margin:15px 0 5px 0;">
+    <a id="p-more" href="" style="vertical-align:middle;margin:0 0 0 5px;">&raquo; 詳細情報</a>
+  </div>
+  <div id="p-more_table" class="radius" style="padding:15px;border:1px solid #ddd;background-color:#eee;<?cs if:!open ?>display:none;<?cs /if ?>">
+    <table class="stripe" style="width:100%;">
+      <tr>
+        <th style="text-align:left;width:100px;">テスト対象</th>
+        <th class="mark"></th>
+        <td <?cs if:err_target ?>class="error"<?cs /if ?>>
+          <input type="text" name="target" value="<?cs var:target ?>" maxlength="40" style="width:200px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">40文字以内（例）WEB、携帯・スマホ、会計システム</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">システム種別</th>
+        <th class="mark"></th>
+        <td <?cs if:err_sys_type ?>class="error"<?cs /if ?>>
+          <input type="text" name="sys_type" value="<?cs var:sys_type ?>" maxlength="40" style="width:200px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">40文字以内（例）フロント、バッチ、帳票</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">テストフェーズ</th>
+        <th class="mark"></th>
+        <td <?cs if:err_phase ?>class="error"<?cs /if ?>>
+          <input type="text" name="phase" value="<?cs var:phase ?>" maxlength="40" style="width:200px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">40文字以内（例）単体、結合、総合、受入</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">機能数</th>
+        <th class="mark"></th>
+        <td <?cs if:err_n_func ?>class="error"<?cs /if ?>>
+          <input type="text" name="n_func" value="<?cs var:n_func ?>" maxlength="9" style="width:80px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">整数9桁以内</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">画面数</th>
+        <th class="mark"></th>
+        <td <?cs if:err_n_screen ?>class="error"<?cs /if ?>>
+          <input type="text" name="n_screen" value="<?cs var:n_screen ?>" maxlength="9" style="width:80px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">整数9桁以内</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">マスターケース数</th>
+        <th class="mark"></th>
+        <td <?cs if:err_n_master ?>class="error"<?cs /if ?>>
+          <input type="text" name="n_master" value="<?cs var:n_master ?>" maxlength="9" style="width:80px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">整数9桁以内 マスターとなるケース数を入力してください</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">実績設計工数</th>
+        <th class="mark"></th>
+        <td <?cs if:err_t_design_fixed ?>class="error"<?cs /if ?>>
+          <input type="text" name="t_design_fixed" value="<?cs var:t_design_fixed ?>" maxlength="9" style="width:80px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">人日 整数9桁以内</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">実績実行工数</th>
+        <th class="mark"></th>
+        <td <?cs if:err_t_test_fixed ?>class="error"<?cs /if ?>>
+          <input type="text" name="t_test_fixed" value="<?cs var:t_test_fixed ?>" maxlength="9" style="width:80px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">人日 整数9桁以内</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">見積金額</th>
+        <th class="mark"></th>
+        <td <?cs if:err_p_budget ?>class="error"<?cs /if ?>>
+          <input type="text" name="p_budget" value="<?cs var:p_budget ?>" maxlength="9" style="width:80px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">円 整数9桁以内</span>
+        </td>
+      </tr>
+      <tr>
+        <th style="text-align:left;">実績金額</th>
+        <th class="mark"></th>
+        <td <?cs if:err_p_fixed ?>class="error"<?cs /if ?>>
+          <input type="text" name="p_fixed" value="<?cs var:p_fixed ?>" maxlength="9" style="width:80px;" />
+          <span style="color:#999;vertical-align:middle;margin:0 0 0 10px;">円 整数9桁以内</span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="margin:30px 0 40px 0;text-align:center;">
+    <?cs if:proj_id ?>
+      <a href="_proj_v?i=<?cs var:proj_id ?>" class="button large" style="width:80px;">キャンセル</a>
+    <?cs else ?>
+      <a href="_proj_l" class="button large" style="width:80px;">キャンセル</a>
+    <?cs /if ?>
+
+    <input type="submit" value="登録する" class="button green large" style="margin:0 0 0 30px;width:110px;" />
+  </div>
+</form>
+<div id="p-corp_id" style="display:none;"><?cs var:corp_id ?></div>
+<div id="p-serv_id" style="display:none;"><?cs var:serv_id ?></div>
+</body>
+</HTML>
